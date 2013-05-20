@@ -1,5 +1,19 @@
 {-# LANGUAGE InstanceSigs, KindSignatures, GADTs, RankNTypes, ConstraintKinds, ScopedTypeVariables, FlexibleInstances #-}
 
+-- |
+-- Module: Control.Category.ConstrainedNormal
+-- Copyright: (c) 2013 The University of Kansas
+-- License: BSD3
+--
+-- Maintainer: Neil Sculthorpe <neil@ittc.ku.edu>
+--             (Control.Category.ConstrainedNormal added by Dominic Orchard)
+-- Stability: alpha
+-- Portability: ghc
+--
+-- This module provides constrained normalised type classes.  The ideas behind this module are documented in the following paper:
+--
+--   /The Constrained-Monad Problem/.  Neil Sculthorpe and Jan Bracker and George Giorgidze and Andy Gill.  2013. <http://www.ittc.ku.edu/~neil/papers_and_talks/constrained-monad-problem.pdf>
+
 module Control.Category.ConstrainedNormal 
     (NC(..), liftNC, lowerNC) where
 
@@ -19,10 +33,11 @@ data NC :: (* -> Constraint) -> (* -> * -> *) -> * -> * -> * where
     Unit :: NC c a x x
     Comp :: c y => NC c a y z -> a x y -> NC c a x z 
 
-liftNC :: (c y) => a x y -> NC c a x y
-liftNC f = Comp Unit f                 -- left-unit law
+liftNC :: (c z) => a x z -> NC c a x z
+liftNC f = Comp Unit f                  -- left-unit law
 
 lowerNC :: forall x a c z . a z z -> (forall x y . c y => a y z -> a x y -> a x z) -> NC c a x z -> a x z
 lowerNC unit comp = lowerNA' where lowerNA' :: forall y . NC c a y z -> a y z
                                    lowerNA' Unit       = unit
                                    lowerNA' (Comp g f) = comp (lowerNA' g) f
+
