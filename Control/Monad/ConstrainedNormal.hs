@@ -124,19 +124,6 @@ lowerNM = foldNM
 
 -------------------------------------------------------------------------------------------------
 
-> data NC :: (* -> Constraint) -> (* -> *) -> * -> * where
->     Extract :: NC c d a -> a
->     Extend :: c a => (NC c d a -> b) -> NC c d a -> NC c d b
-
-> liftNC :: c a => d a -> NC c d a
-> liftNC da = Extend Extract da -- right-identity law
-
-> lowerNC :: forall 
-
- foldNC :: forall 
-
--------------------------------------------------------------------------------------------------
-
 data NMP (c :: * -> Constraint) (t :: * -> *) (a :: *)
   =  MZero
   |  MPlus (NMP' c t a) (NMP c t a)
