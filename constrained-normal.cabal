@@ -17,7 +17,7 @@ Description:	     The package provides normal forms for monads and related struc
 Category:            Control
 License:             BSD3
 License-file:        LICENSE
-Author:              Neil Sculthorpe
+Author:              Neil Sculthorpe, Dominic Orchard
 Maintainer:          Neil Sculthorpe <neil@ittc.ku.edu>
 Copyright:           (c) 2013 The University of Kansas
 Homepage:            http://www.ittc.ku.edu/csdl/fpg/theory/constrained-monad-problem.html
@@ -31,7 +31,7 @@ Library
   Ghc-Options: -Wall
   Exposed-modules:
        Control.Monad.ConstrainedNormal
-       -- Control.Comonad.ConstrainedNormal
+       Control.Comonad.ConstrainedNormal
        Control.Category.ConstrainedNormal
 
 
