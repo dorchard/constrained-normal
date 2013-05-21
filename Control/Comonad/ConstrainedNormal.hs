@@ -39,7 +39,7 @@ lowerNCM :: forall a c d . (forall x . c x => (d x -> a) -> d x -> d a) -> NCM c
 lowerNCM ext = lowerNCM' where lowerNCM' :: NCM c d a -> d a
                                lowerNCM' (NCM (Extend Extract dx) _)      = dx
                                lowerNCM' (NCM (Extend (NCK k) dx) counit) = ext (k . (liftNCM counit)) dx
-asd
+
 instance Functor (NCM c d) where
     fmap = liftW
 
