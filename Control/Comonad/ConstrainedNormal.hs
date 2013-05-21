@@ -33,7 +33,7 @@ data NCM :: (* -> Constraint) -> (* -> *) -> * -> * where
 -- Comonad operations are split across the lifting and lowering functions
 
 liftNCM :: c x => (forall w . c w => d w -> w) -> d x -> NCM c d x
-liftNCM counit dx = NCM (Extend Extract dx) counit
+liftNCM counit dx = NCM (Extend Extract dx) counit                    -- right-unit law
 
 lowerNCM :: forall a c d . (forall x . c x => (d x -> a) -> d x -> d a) -> NCM c d a -> d a
 lowerNCM ext = lowerNCM' where lowerNCM' :: NCM c d a -> d a
@@ -44,9 +44,9 @@ instance Functor (NCM c d) where
     fmap = liftW
 
 instance Comonad (NCM c d) where
-    extract (NCM (Extend (NCK k) dx) counit) = k (liftNCM counit dx)
+    extract (NCM (Extend (NCK k) dx) counit) = k (liftNCM counit dx) 
     extract (NCM (Extend Extract dx) counit) = counit dx
 
-    extend k (NCM (Extend Extract dx) counit) = NCM (Extend (NCK k) dx) counit
-    extend k (NCM (Extend (NCK g) dx) counit) = NCM (Extend (NCK $ k . extend g) dx) counit 
+    extend k (NCM (Extend Extract dx) counit) = NCM (Extend (NCK k) dx) counit               -- left-unit law
+    extend k (NCM (Extend (NCK g) dx) counit) = NCM (Extend (NCK $ k . extend g) dx) counit  -- associativity law
 
