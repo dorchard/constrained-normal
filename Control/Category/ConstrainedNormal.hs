@@ -1,16 +1,7 @@
 {-# LANGUAGE InstanceSigs, KindSignatures, GADTs, RankNTypes, ConstraintKinds, ScopedTypeVariables, FlexibleInstances #-}
 
--- |
--- Module: Control.Category.ConstrainedNormal
--- Copyright: (c) 2013 The University of Kansas
--- License: BSD3
---
--- Maintainer: Neil Sculthorpe <neil@ittc.ku.edu>
---             (Control.Category.ConstrainedNormal added by Dominic Orchard)
--- Stability: alpha
--- Portability: ghc
---
--- This module provides constrained normalised type classes.  The ideas behind this module are documented in the following paper:
+-- This module provides constrained normalised categories, by Dominic Orchard,
+--  based on the work of Neil Sculthorpe et al. documented in their paper: 
 --
 --   /The Constrained-Monad Problem/.  Neil Sculthorpe and Jan Bracker and George Giorgidze and Andy Gill.  2013. <http://www.ittc.ku.edu/~neil/papers_and_talks/constrained-monad-problem.pdf>
 

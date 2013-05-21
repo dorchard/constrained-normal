@@ -1,5 +1,11 @@
 {-# LANGUAGE InstanceSigs, KindSignatures, GADTs, RankNTypes, ConstraintKinds, ScopedTypeVariables, FlexibleInstances #-}
 
+-- This module provides constrained normalised comonads, by Dominic Orchard,
+--  based on the work of Neil Sculthorpe et al. documented in their paper: 
+--
+--   /The Constrained-Monad Problem/.  Neil Sculthorpe and Jan Bracker and George Giorgidze and Andy Gill.  2013. <http://www.ittc.ku.edu/~neil/papers_and_talks/constrained-monad-problem.pdf>
+
+
 module Control.Comonad.ConstrainedNormal
   ( -- * Constrained Normalised Comonads
     NCM(..), liftNCM, lowerNCM
