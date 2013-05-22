@@ -7,10 +7,10 @@
   (major1) == 4 && (major2) <  6 || \
   (major1) == 4 && (major2) == 6 && (minor) <= 0)
 
-/* package comonad-3.0.1.1 */
-#define VERSION_comonad "3.0.1.1"
+/* package comonad-3.1.0 */
+#define VERSION_comonad "3.1.0"
 #define MIN_VERSION_comonad(major1,major2,minor) (\
   (major1) <  3 || \
-  (major1) == 3 && (major2) <  0 || \
-  (major1) == 3 && (major2) == 0 && (minor) <= 1)
+  (major1) == 3 && (major2) <  1 || \
+  (major1) == 3 && (major2) == 1 && (minor) <= 0)
 

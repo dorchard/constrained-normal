@@ -8,7 +8,7 @@
 
 module Control.Comonad.ConstrainedNormal
   ( -- * Constrained Normalised Comonads
-    NCM(..), liftNCM, lowerNCM
+    NCM, liftNCM, lowerNCM
   )
 where
 
@@ -18,12 +18,9 @@ import Control.Comonad
 
 -------------------------------------------------------------------------------------------------
 
-data NCoKleisli :: (* -> Constraint) -> (* -> *) -> * -> * -> * where
-    NCK :: (NCM c d a -> b) -> NCoKleisli c d a b
-    Extract :: NCoKleisli c d a a
-
 data NCM' :: (* -> Constraint) -> (* -> *) -> * -> * where
-    Extend :: c x => (NCoKleisli c d x y) -> d x -> NCM' c d y
+    Extend :: c x => (NCM c d x -> y) -> d x -> NCM' c d y
+    ExtendExtract :: c x => d x -> NCM' c d x -- extension of extract, captures parameter for extract
 
 -- The constrained 'extract' operation is contained in the normalised computation
 
@@ -33,20 +30,20 @@ data NCM :: (* -> Constraint) -> (* -> *) -> * -> * where
 -- Comonad operations are split across the lifting and lowering functions
 
 liftNCM :: c x => (forall w . c w => d w -> w) -> d x -> NCM c d x
-liftNCM counit dx = NCM (Extend Extract dx) counit                    -- right-unit law
+liftNCM counit dx = NCM (ExtendExtract dx) counit  -- right-unit law
 
 lowerNCM :: forall a c d . (forall x . c x => (d x -> a) -> d x -> d a) -> NCM c d a -> d a
 lowerNCM ext = lowerNCM' where lowerNCM' :: NCM c d a -> d a
-                               lowerNCM' (NCM (Extend Extract dx) _)      = dx
-                               lowerNCM' (NCM (Extend (NCK k) dx) counit) = ext (k . (liftNCM counit)) dx
+                               lowerNCM' (NCM (ExtendExtract dx) _) = dx
+                               lowerNCM' (NCM (Extend k dx) counit) = ext (k . (liftNCM counit)) dx
 
 instance Functor (NCM c d) where
     fmap = liftW
 
 instance Comonad (NCM c d) where
-    extract (NCM (Extend (NCK k) dx) counit) = k (liftNCM counit dx) 
-    extract (NCM (Extend Extract dx) counit) = counit dx
+    extract (NCM (Extend k dx) counit)      = k (liftNCM counit dx) -- left-unit law
+    extract (NCM (ExtendExtract dx) counit) = counit dx             -- left-unit law
 
-    extend k (NCM (Extend Extract dx) counit) = NCM (Extend (NCK k) dx) counit               -- left-unit law
-    extend k (NCM (Extend (NCK g) dx) counit) = NCM (Extend (NCK $ k . extend g) dx) counit  -- associativity law
+    extend k (NCM (ExtendExtract dx) counit) = NCM (Extend k dx) counit               -- right-unit law
+    extend k (NCM (Extend g dx) counit)      = NCM (Extend (k . extend g) dx) counit  -- associativity law
 
