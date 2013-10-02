@@ -6,7 +6,7 @@
 --   /The Constrained-Monad Problem/.  Neil Sculthorpe and Jan Bracker and George Giorgidze and Andy Gill.  2013. <http://www.ittc.ku.edu/~neil/papers_and_talks/constrained-monad-problem.pdf>
 
 
-module Control.Comonad.ConstrainedNormal2
+module Control.Comonad.ConstrainedNormalAlt
   ( -- * Constrained Normalised Comonads
     NCM, liftNCM, lowerNCM
   )
@@ -32,7 +32,7 @@ data NCM :: (* -> Constraint) -> (* -> *) -> * -> * where
 liftNCM :: c x => (forall w . c w => d w -> w) -> d x -> NCM c d x
 liftNCM counit dx = NCM (ExtendExtract dx) counit  -- right-unit law
 
-lowerNCM :: forall a c d . (forall x y . c x => (d x -> y) -> d x -> d y) -> NCM c d a -> d a
+lowerNCM :: forall a c d . c a => (forall x y . (c x, c y) => (d x -> y) -> d x -> d y) -> NCM c d a -> d a
 lowerNCM ext = lowerNCM' where lowerNCM' :: NCM c d a -> d a
                                lowerNCM' (NCM (ExtendExtract dx) _) = dx
                                lowerNCM' (NCM (Extend k dx) counit) = ext (k . (liftNCM counit)) (lowerNCM ext dx)
@@ -44,6 +44,6 @@ instance Comonad (NCM c d) where
     extract (NCM (Extend k dx) counit)      = k dx       -- left-unit law
     extract (NCM (ExtendExtract dx) counit) = counit dx  -- right-unit law
 
-    extend k (NCM (ExtendExtract dx) counit) = NCM (Extend k (NCM (ExtendExtract dx) counit)) counit -- right-unit law
+    extend k (NCM (ExtendExtract dx) counit) = NCM (Extend k (liftNCM counit dx)) counit -- right-unit law/lift
     extend k (NCM (Extend g dx) counit)      = NCM (Extend (k . extend g) dx) counit  -- associativity law
 
