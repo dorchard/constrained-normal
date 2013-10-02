@@ -42,7 +42,7 @@ instance Functor (NCM c d) where
 
 instance Comonad (NCM c d) where
     extract (NCM (Extend k dx) counit)      = k (liftNCM counit dx) -- left-unit law
-    extract (NCM (ExtendExtract dx) counit) = counit dx             -- left-unit law
+    extract (NCM (ExtendExtract dx) counit) = counit dx             -- right-unit law
 
     extend k (NCM (ExtendExtract dx) counit) = NCM (Extend k dx) counit               -- right-unit law
     extend k (NCM (Extend g dx) counit)      = NCM (Extend (k . extend g) dx) counit  -- associativity law
