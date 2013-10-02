@@ -1,14 +1,15 @@
 {-# LANGUAGE InstanceSigs, KindSignatures, GADTs, RankNTypes, ConstraintKinds, ScopedTypeVariables, FlexibleInstances #-}
 
 -- This module provides constrained normalised comonads, by Dominic Orchard,
---  based on the work of Neil Sculthorpe et al. documented in their paper: 
+--  based on the work of Neil Sculthorpe et al. documented in their paper:
 --
 --   /The Constrained-Monad Problem/.  Neil Sculthorpe and Jan Bracker and George Giorgidze and Andy Gill.  2013. <http://www.ittc.ku.edu/~neil/papers_and_talks/constrained-monad-problem.pdf>
 
 
 module Control.Comonad.ConstrainedNormal
   ( -- * Constrained Normalised Comonads
-    NCM, liftNCM, lowerNCM
+    NCM, liftNCM, lowerNCM,
+    CopointedFunctor(..), NCPF(..), liftNCPF, lowerNCPF
   )
 where
 
@@ -47,3 +48,31 @@ instance Comonad (NCM c d) where
     extend k (NCM (ExtendExtract dx) counit) = NCM (Extend k dx) counit               -- right-unit law
     extend k (NCM (Extend g dx) counit)      = NCM (Extend (k . extend g) dx) counit  -- associativity law
 
+-------------------------------------------------------------------------------------------------
+
+class Functor f => CopointedFunctor (f :: * -> *) where
+  copoint :: f a -> a
+
+data NCPF :: (* -> Constraint) -> (* -> *) -> * -> * where
+  FMap :: c x => (x -> a) -> t x -> (t x -> x) -> NCPF c t a
+
+instance Functor (NCPF c t) where
+  fmap :: (a -> b) -> NCPF c t a -> NCPF c t b
+  fmap g (FMap h tx counit)  = FMap (g . h) tx counit -- composition law
+
+instance CopointedFunctor (NCPF c t) where
+  copoint :: NCPF c t a -> a
+  copoint (FMap g tx counit) = g (counit tx)
+
+-- destructive copoint operation must be given when lifting
+liftNCPF :: c a => (t a -> a) -> t a -> NCPF c t a
+liftNCPF counit ta = FMap id ta counit -- identity law
+
+-- constructive fmap operation can be given when folding
+foldNCPF :: (forall x. c x => (x -> a) -> t x -> r) -> NCPF c t a -> r
+foldNCPF fmp (FMap g tx _) = fmp g tx
+
+lowerNCPF :: (forall x. c x => (x -> a) -> t x -> t a) -> NCPF c t a -> t a
+lowerNCPF  = foldNCPF
+
+-------------------------------------------------------------------------------------------------
